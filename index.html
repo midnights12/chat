@@ -34,13 +34,21 @@
       color: var(--text);
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .page {
+      width: min(960px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
     .app {
-      width: min(960px, 100%);
+      width: 100%;
       height: min(720px, 100vh - 48px);
       background: var(--card-bg);
       backdrop-filter: blur(18px);
@@ -225,9 +233,133 @@
       margin-top: 6px;
     }
 
+    .api-card {
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      padding: 24px 28px;
+      backdrop-filter: blur(18px);
+    }
+
+    .api-card h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .api-card p {
+      margin: 8px 0 20px;
+      color: #64748b;
+      font-size: 0.92rem;
+    }
+
+    .api-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 16px;
+      align-items: flex-end;
+      margin-bottom: 16px;
+    }
+
+    .api-form label {
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .api-form label.toggle {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .api-form input[type="text"],
+    .api-form textarea {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.9);
+      color: inherit;
+      min-width: 200px;
+      font: inherit;
+      box-sizing: border-box;
+    }
+
+    .api-form textarea {
+      min-height: 64px;
+      max-width: 100%;
+      resize: vertical;
+    }
+
+    .api-form input[type="text"]:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .api-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .api-actions button {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .api-actions button.primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.15);
+    }
+
+    .api-actions button:hover:not(:disabled) {
+      background: rgba(37, 99, 235, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .api-actions button.primary:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
+
+    .api-actions button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .api-output {
+      margin: 0;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.04);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      max-height: 280px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
     @media (max-width: 720px) {
       body {
         padding: 12px;
+      }
+
+      .page {
+        gap: 16px;
       }
 
       .app {
@@ -242,53 +374,108 @@
       .bubble {
         max-width: 88%;
       }
+
+      .api-card {
+        border-radius: 16px;
+        padding: 20px 18px;
+      }
+
+      .api-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .api-form input[type="text"],
+      .api-form textarea {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .api-form label.toggle {
+        flex-direction: row;
+        justify-content: flex-start;
+      }
+
+      .api-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>Stack AI 聊天测试台</h1>
-      <p>基于 Stack AI 推理 API 的简易调试工具，支持上下文与流式输出。</p>
-    </header>
+  <div class="page">
+    <div class="app">
+      <header>
+        <h1>Stack AI 聊天测试台</h1>
+        <p>基于 Stack AI 推理 API 的简易调试工具，支持上下文与流式输出。</p>
+      </header>
 
-    <section class="controls">
-      <label>
-        <input id="include-user-id" type="checkbox" checked />
-        发送 user_id
-      </label>
-      <label>
-        用户 ID (user_id)
-        <input id="user-id" type="text" value="test" placeholder="默认 test" />
-      </label>
-      <label>
-        <input id="include-conversation-id" type="checkbox" checked />
-        发送 conversation_id
-      </label>
-      <label>
-        会话 ID (conversation_id)
-        <input id="conversation-id" type="text" value="test1" placeholder="默认 test1" />
-      </label>
-      <label>
-        <input id="stream-toggle" type="checkbox" checked />
-        启用流式输出
-      </label>
-      <button id="clear-chat" type="button">清空会话</button>
-    </section>
+      <section class="controls">
+        <label>
+          <input id="include-user-id" type="checkbox" checked />
+          发送 user_id
+        </label>
+        <label>
+          用户 ID (user_id)
+          <input id="user-id" type="text" value="test" placeholder="默认 test" />
+        </label>
+        <label>
+          <input id="include-conversation-id" type="checkbox" checked />
+          发送 conversation_id
+        </label>
+        <label>
+          会话 ID (conversation_id)
+          <input id="conversation-id" type="text" value="test1" placeholder="默认 test1" />
+        </label>
+        <label>
+          <input id="stream-toggle" type="checkbox" checked />
+          启用流式输出
+        </label>
+        <button id="clear-chat" type="button">清空会话</button>
+      </section>
 
-    <main id="chat-window" class="chat-window" aria-live="polite"></main>
+      <main id="chat-window" class="chat-window" aria-live="polite"></main>
 
-    <footer class="composer">
-      <form id="message-form">
-        <textarea id="message-input" placeholder="在此输入消息，按 Enter 发送，Shift + Enter 换行" rows="2"></textarea>
-        <button id="send-button" type="submit">发送</button>
+      <footer class="composer">
+        <form id="message-form">
+          <textarea id="message-input" placeholder="在此输入消息，按 Enter 发送，Shift + Enter 换行" rows="2"></textarea>
+          <button id="send-button" type="submit">发送</button>
+        </form>
+        <div class="tip">提示：Stack AI 会自动保留上下文，无需手动传递历史记录。</div>
+      </footer>
+    </div>
+
+    <section class="api-card" aria-labelledby="conversations-tool-title">
+      <h2 id="conversations-tool-title">Conversations API 调试</h2>
+      <p>调用 <code>GET /projects/&lt;project_id&gt;/conversations</code> 获取会话列表，参数可自定义（项目 ID 与鉴权保持固定）。</p>
+
+      <form id="conversations-form" class="api-form">
+        <label class="toggle">
+          <input id="include-conversations-user-id" type="checkbox" checked />
+          发送 X-User-Id 请求头
+        </label>
+        <label>
+          X-User-Id
+          <input id="conversations-user-id" type="text" value="test" placeholder="可留空使用默认" />
+        </label>
+        <label>
+          查询参数（JSON 或 Query String，可选）
+          <textarea id="conversations-query" placeholder='例如 {"limit": 20} 或 limit=20&cursor=abc'></textarea>
+        </label>
       </form>
-      <div class="tip">提示：Stack AI 会自动保留上下文，无需手动传递历史记录。</div>
-    </footer>
+
+      <div class="api-actions">
+        <button id="fetch-conversations" class="primary" type="button">获取会话列表</button>
+        <button id="clear-conversations" type="button">清空输出</button>
+      </div>
+
+      <pre id="conversations-output" class="api-output" aria-live="polite"></pre>
+    </section>
   </div>
 
   <script>
     const API_URL = "https://api.stack-ai.com/inference/v0/run/829ca873-74d8-4eb2-8251-5af703f3d01d/68c81b0907388e6a8f237491";
+    const CONVERSATIONS_URL = "https://api.stack-ai.com/projects/829ca873-74d8-4eb2-8251-5af703f3d01d/conversations";
     const HEADERS = {
       "Authorization": "Bearer 8b700530-c183-4c9d-8fd2-7fb5e3046466",
       "Content-Type": "application/json"
@@ -304,6 +491,13 @@
     const conversationIdInput = document.getElementById("conversation-id");
     const streamToggle = document.getElementById("stream-toggle");
     const clearButton = document.getElementById("clear-chat");
+    const conversationsForm = document.getElementById("conversations-form");
+    const includeConversationsUserIdToggle = document.getElementById("include-conversations-user-id");
+    const conversationsUserIdInput = document.getElementById("conversations-user-id");
+    const conversationsQueryInput = document.getElementById("conversations-query");
+    const fetchConversationsButton = document.getElementById("fetch-conversations");
+    const clearConversationsButton = document.getElementById("clear-conversations");
+    const conversationsOutput = document.getElementById("conversations-output");
 
     function syncOptionalInput(toggle, input) {
       const update = () => {
@@ -315,6 +509,7 @@
 
     syncOptionalInput(includeUserIdToggle, userIdInput);
     syncOptionalInput(includeConversationIdToggle, conversationIdInput);
+    syncOptionalInput(includeConversationsUserIdToggle, conversationsUserIdInput);
 
     function createMessage(role, content) {
       const wrapper = document.createElement("div");
@@ -507,6 +702,107 @@
     });
 
     messageInput.focus();
+
+    function buildQueryString(text) {
+      if (!text) {
+        return "";
+      }
+
+      const trimmed = text.trim();
+      if (!trimmed) {
+        return "";
+      }
+
+      if (!trimmed.startsWith("{")) {
+        const sanitized = trimmed.startsWith("?") ? trimmed.slice(1) : trimmed;
+        return sanitized ? `?${sanitized}` : "";
+      }
+
+      const parsed = JSON.parse(trimmed);
+      const searchParams = new URLSearchParams();
+
+      Object.entries(parsed).forEach(([key, value]) => {
+        if (value === undefined || value === null) {
+          return;
+        }
+        if (Array.isArray(value)) {
+          value.forEach((entry) => {
+            if (entry !== undefined && entry !== null) {
+              searchParams.append(key, entry);
+            }
+          });
+          return;
+        }
+        searchParams.append(key, value);
+      });
+
+      const output = searchParams.toString();
+      return output ? `?${output}` : "";
+    }
+
+    async function fetchConversations() {
+      conversationsOutput.textContent = "正在请求会话列表...";
+      fetchConversationsButton.disabled = true;
+
+      const headers = {
+        "Authorization": HEADERS["Authorization"],
+        "Accept": "application/json"
+      };
+
+      if (includeConversationsUserIdToggle.checked) {
+        const headerUserId = conversationsUserIdInput.value.trim();
+        headers["X-User-Id"] = headerUserId || "test";
+      }
+
+      let queryString = "";
+      const queryText = conversationsQueryInput.value.trim();
+
+      try {
+        queryString = buildQueryString(queryText);
+      } catch (error) {
+        conversationsOutput.textContent = `查询参数解析失败：${error.message}`;
+        fetchConversationsButton.disabled = false;
+        return;
+      }
+
+      try {
+        const response = await fetch(`${CONVERSATIONS_URL}${queryString}`, {
+          method: "GET",
+          headers
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        conversationsOutput.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        conversationsOutput.textContent = `请求失败：${error.message}`;
+      } finally {
+        fetchConversationsButton.disabled = false;
+      }
+    }
+
+    conversationsForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      fetchConversations();
+    });
+
+    fetchConversationsButton.addEventListener("click", () => {
+      fetchConversations();
+    });
+
+    conversationsQueryInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        fetchConversations();
+      }
+    });
+
+    clearConversationsButton.addEventListener("click", () => {
+      conversationsOutput.textContent = "";
+    });
   </script>
 </body>
 </html>
