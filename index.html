@@ -94,6 +94,12 @@
       min-width: 120px;
     }
 
+    .controls input[type="text"]:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
     .controls button {
       padding: 6px 14px;
       border-radius: 8px;
@@ -248,8 +254,20 @@
 
     <section class="controls">
       <label>
-        用户 ID
-        <input id="user-id" type="text" value="test" placeholder="会话 ID" />
+        <input id="include-user-id" type="checkbox" checked />
+        发送 user_id
+      </label>
+      <label>
+        用户 ID (user_id)
+        <input id="user-id" type="text" value="test" placeholder="默认 test" />
+      </label>
+      <label>
+        <input id="include-conversation-id" type="checkbox" checked />
+        发送 conversation_id
+      </label>
+      <label>
+        会话 ID (conversation_id)
+        <input id="conversation-id" type="text" value="test1" placeholder="默认 test1" />
       </label>
       <label>
         <input id="stream-toggle" type="checkbox" checked />
@@ -280,9 +298,23 @@
     const messageForm = document.getElementById("message-form");
     const messageInput = document.getElementById("message-input");
     const sendButton = document.getElementById("send-button");
+    const includeUserIdToggle = document.getElementById("include-user-id");
     const userIdInput = document.getElementById("user-id");
+    const includeConversationIdToggle = document.getElementById("include-conversation-id");
+    const conversationIdInput = document.getElementById("conversation-id");
     const streamToggle = document.getElementById("stream-toggle");
     const clearButton = document.getElementById("clear-chat");
+
+    function syncOptionalInput(toggle, input) {
+      const update = () => {
+        input.disabled = !toggle.checked;
+      };
+      toggle.addEventListener("change", update);
+      update();
+    }
+
+    syncOptionalInput(includeUserIdToggle, userIdInput);
+    syncOptionalInput(includeConversationIdToggle, conversationIdInput);
 
     function createMessage(role, content) {
       const wrapper = document.createElement("div");
@@ -404,13 +436,21 @@
     }
 
     async function sendMessage(message) {
-      const userId = userIdInput.value.trim() || "test";
       const streamEnabled = streamToggle.checked;
       const payload = {
-        "user_id": userId,
         "in-0": message,
         "stream": streamEnabled
       };
+
+      if (includeUserIdToggle.checked) {
+        const userId = userIdInput.value.trim() || "test";
+        payload["user_id"] = userId;
+      }
+
+      if (includeConversationIdToggle.checked) {
+        const conversationId = conversationIdInput.value.trim() || "test1";
+        payload["conversation_id"] = conversationId;
+      }
 
       const assistantBubble = createMessage("assistant", "");
 
