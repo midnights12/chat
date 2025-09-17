@@ -644,7 +644,7 @@
 
       if (includeConversationIdToggle.checked) {
         const conversationId = conversationIdInput.value.trim() || "test1";
-        payload["conversation_id"] = conversationId;
+        payload["id"] = conversationId;
       }
 
       const assistantBubble = createMessage("assistant", "");
